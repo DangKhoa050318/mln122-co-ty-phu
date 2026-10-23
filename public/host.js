@@ -37,8 +37,10 @@
   // ---------- bố cục ----------
   // Bàn cờ chiếm gần hết chiều cao màn hình, cột đội + nhật ký bên phải rộng tối thiểu 300px.
   // Màn hình dọc hoặc hẹp (điện thoại, máy tính bảng dọc): bàn cờ ở trên, cột đội ở dưới.
+  // Đo bằng clientWidth thay vì innerWidth: trên Chrome điện thoại, khi trang tràn ngang thì innerWidth
+  // bị nới theo bề rộng nội dung, bàn cờ bị tính to hơn màn hình và lệch mất phần bên trái.
   function fit() {
-    const W = window.innerWidth, H = window.innerHeight;
+    const W = document.documentElement.clientWidth, H = document.documentElement.clientHeight;
     const head = document.querySelector('.hbar').offsetHeight || 56;
     const stacked = W < 900 || W < H;
     document.body.classList.toggle('stacked', stacked);
