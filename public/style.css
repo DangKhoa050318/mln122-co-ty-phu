@@ -372,7 +372,7 @@ body.play .toast { bottom: calc(84px + env(safe-area-inset-bottom)); }
 
 /* host trên màn hình dọc/hẹp: bàn cờ trên, cột đội dưới */
 body.host.stacked { overflow: auto; height: auto; }
-body.host.stacked .hmain { flex-direction: column; align-items: center; }
+body.host.stacked .hmain { flex-direction: column; align-items: center; align-items: safe center; } /* safe: nếu bàn cờ rộng hơn màn hình thì tràn sang phải (cuộn được), không mất bên trái */
 body.host.stacked .side { width: 100%; max-width: 860px; min-width: 0; padding: 0; overflow: visible; }
 @media (max-width: 700px) {
   .hbar h1 { font-size: 1rem; white-space: normal; }

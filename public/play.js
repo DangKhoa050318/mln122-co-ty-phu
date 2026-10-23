@@ -107,11 +107,12 @@
   }
   function fit() {
     const b = $('board');
+    const W = document.documentElement.clientWidth, H = document.documentElement.clientHeight; // như host.js: không dùng innerWidth
     if (DESK.matches) {
       const hh = document.querySelector('.pbar').offsetHeight || 56;
-      const avail = Math.min(window.innerHeight - hh - 24, window.innerWidth - 340 - 46);
+      const avail = Math.min(H - hh - 24, W - 340 - 46);
       G.board.size(b, Math.floor(Math.max(440, Math.min(avail, 1100))));
-    } else G.board.size(b, Math.min(window.innerWidth - 16, 680));
+    } else G.board.size(b, Math.min(W - 16, 680));
   }
   window.addEventListener('resize', fit);
   DESK.addEventListener('change', () => { fit(); render(); });
