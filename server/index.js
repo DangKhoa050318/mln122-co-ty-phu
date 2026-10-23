@@ -28,7 +28,8 @@ function lanAddresses() {
   }
   return out.sort((a, b) => b.score - a.score).map(({ ip, name }) => ({ ip, name }));
 }
-const isLoopback = (req) => ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress);
+// Trên Render/hosting, request đi qua proxy cục bộ (cũng là 127.0.0.1) nhưng luôn có X-Forwarded-For.
+const isLoopback = (req) => !req.headers['x-forwarded-for'] && ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress);
 
 app.get('/healthz', (_req, res) => res.type('text').send('ok'));
 app.use('/api', (_req, res, next) => { res.set({ 'Access-Control-Allow-Origin': '*', 'Cache-Control': 'no-store' }); next(); });
