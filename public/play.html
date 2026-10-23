@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e4ede6">
+<title>Cờ Tỷ Phú: người chơi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%8E%B2%3C/text%3E%3C/svg%3E">
+</head>
+<body class="play">
+<div id="joinView" class="landing hide">
+  <div class="wrap">
+    <div class="brand"><h1>Vào phòng chơi</h1><p>Nhập tên để cả lớp nhận ra bạn trên bảng xếp hạng.</p></div>
+    <form id="joinForm" class="note stack" autocomplete="off" novalidate>
+      <div class="field"><label for="room">Mã phòng</label><input id="room" class="code-input" maxlength="4" autocapitalize="characters" spellcheck="false" placeholder="ABCD" required></div>
+      <div id="roomInfo" class="roominfo hide" aria-live="polite"></div>
+      <div class="field"><label for="name">Tên của bạn</label><input id="name" maxlength="20" placeholder="Ví dụ: Minh Anh" autocomplete="nickname" required></div>
+      <div class="err" id="joinErr" role="alert"></div>
+      <button class="btn gold bigbtn" type="submit" id="joinBtn">Vào chơi</button>
+      <a class="sub center-link" href="index.html">Về trang chủ</a>
+    </form>
+  </div>
+</div>
+
+<div id="app" class="papp hide" data-tab="play">
+  <header class="pbar">
+    <a class="pbrand" href="index.html" title="Trang chủ">Cờ Tỷ Phú</a>
+    <button class="pill roompill" data-ui="invite" title="Mời bạn vào phòng (QR + mã)"><span>Phòng</span> <b class="num" id="roomCode"></b> <span aria-hidden="true">⧉</span></button>
+    <span class="pphase" id="phaseTxt"></span>
+    <span class="sp"></span>
+    <div class="pme" id="me"></div>
+  </header>
+  <div class="pgrid">
+    <section class="pboard" id="tab-board" aria-label="Bàn cờ">
+      <div class="board" id="board"></div>
+      <div id="boardInfo" class="boardinfo"></div>
+    </section>
+    <div class="pright">
+      <section class="pmain" id="tab-play" aria-label="Lượt chơi">
+        <div id="main"></div>
+        <div id="assets"></div>
+      </section>
+      <section class="pside" id="tab-teams" aria-label="Các đội">
+        <h2 class="ptitle">Các đội</h2>
+        <div id="teams" class="pteams"></div>
+        <h2 class="ptitle">Nhật ký</h2>
+        <div class="log" id="log"></div>
+      </section>
+    </div>
+  </div>
+  <nav class="ptabs" aria-label="Chuyển màn hình">
+    <button data-tabto="play"><span aria-hidden="true">🎯</span>Lượt chơi<i class="badge hide" id="badge"></i></button>
+    <button data-tabto="board"><span aria-hidden="true">🗺️</span>Bàn cờ</button>
+    <button data-tabto="teams"><span aria-hidden="true">🏆</span>Các đội</button>
+  </nav>
+</div>
+<div id="conn" class="conn hide">Mất kết nối, đang nối lại…</div>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="board.js"></script>
+<script src="play.js"></script>
+</body>
+</html>

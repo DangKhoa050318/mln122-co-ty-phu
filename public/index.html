@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e4ede6">
+<title>Cờ Tỷ Phú: Cạnh tranh và độc quyền</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%8E%B2%3C/text%3E%3C/svg%3E">
+</head>
+<body>
+<main class="landing">
+  <div class="wrap wide">
+    <div class="brand">
+      <h1>Cờ Tỷ Phú:<br>Cạnh tranh và độc quyền</h1>
+      <p>Trò chơi lớp học cho môn MLN122, Chương 4. Các tập đoàn đi từ tự do cạnh tranh đến độc quyền. Chơi được trên máy tính và điện thoại.</p>
+    </div>
+
+    <div id="resume" class="resume hide"></div>
+
+    <div class="cards">
+      <section class="note" aria-labelledby="h-join">
+        <h2 id="h-join">Vào phòng chơi</h2>
+        <div class="howto">
+          <div class="how"><span class="howic" aria-hidden="true">📱</span><div><b>Điện thoại</b><span>Quét mã QR trên màn hình host</span></div></div>
+          <div class="how"><span class="howic" aria-hidden="true">💻</span><div><b>Máy tính</b><span>Nhập mã phòng 4 ký tự ở đây</span></div></div>
+        </div>
+        <form id="joinForm" class="stack" autocomplete="off" novalidate>
+          <div class="field"><label for="code">Mã phòng</label>
+            <input id="code" class="code-input" maxlength="4" inputmode="text" autocapitalize="characters" spellcheck="false" placeholder="ABCD" required aria-describedby="joinErr"></div>
+          <div class="field"><label for="name">Tên của bạn</label>
+            <input id="name" maxlength="20" placeholder="Ví dụ: Minh Anh" autocomplete="nickname" required></div>
+          <div class="err" id="joinErr" role="alert"></div>
+          <button class="btn gold bigbtn" type="submit" id="joinBtn">Vào phòng</button>
+        </form>
+      </section>
+
+      <section class="note" aria-labelledby="h-host">
+        <h2 id="h-host">Tạo phòng (host)</h2>
+        <p class="sub">Dành cho nhóm tổ chức: mở trên máy chiếu hoặc máy tính, màn hình sẽ hiện bàn cờ, mã QR và mã phòng.</p>
+        <form id="hostForm" class="stack">
+          <div class="two">
+            <div class="field"><label for="teams">Số đội</label>
+              <select id="teams"><option>2</option><option selected>3</option><option>4</option></select></div>
+            <div class="field"><label for="rounds">Số vòng</label>
+              <select id="rounds"><option value="8">8 vòng (~20 phút)</option><option value="10" selected>10 vòng (~27 phút)</option><option value="12">12 vòng (~33 phút)</option></select></div>
+          </div>
+          <button class="btn bigbtn" type="submit">Tạo phòng mới</button>
+        </form>
+      </section>
+    </div>
+  </div>
+</main>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const params = new URLSearchParams(location.search);
+  const read = (k) => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (_) { return null; } };
+  try { $('name').value = localStorage.getItem('mln_name') || ''; } catch (_) {}
+  if (params.get('room')) $('code').value = G.cleanCode(params.get('room'));
+  ($('code').value ? $('name') : $('code')).focus({ preventScroll: true });
+
+  $('code').addEventListener('input', (e) => {
+    const v = G.cleanCode(e.target.value);
+    if (v !== e.target.value) e.target.value = v;
+    $('joinErr').textContent = '';
+    if (v.length === 4 && e.inputType !== 'deleteContentBackward') { $('name').focus(); $('name').select(); }
+  });
+
+  $('joinForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const code = G.cleanCode($('code').value), name = $('name').value.trim();
+    if (code.length !== 4) { $('joinErr').textContent = 'Mã phòng gồm 4 ký tự, xem trên màn hình host.'; return $('code').focus(); }
+    if (!name) { $('joinErr').textContent = 'Hãy nhập tên để cả lớp nhận ra bạn.'; return $('name').focus(); }
+    $('joinBtn').disabled = true; $('joinBtn').textContent = 'Đang kiểm tra…';
+    const r = await G.checkRoom(code);
+    $('joinBtn').disabled = false; $('joinBtn').textContent = 'Vào phòng';
+    if (r.ok === false) { $('joinErr').textContent = `Không tìm thấy phòng ${code}. Kiểm tra lại mã trên màn hình host.`; return $('code').select(); }
+    if (r.ended) { $('joinErr').textContent = `Ván ở phòng ${code} đã kết thúc.`; return; }
+    try { localStorage.setItem('mln_name', name); sessionStorage.setItem('mln_autojoin', code); } catch (_) {}
+    location.href = 'play.html?room=' + encodeURIComponent(code);
+  });
+
+  $('hostForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    try { localStorage.removeItem('mln_host'); } catch (_) {}
+    location.href = 'host.html?new=1&teams=' + $('teams').value + '&rounds=' + $('rounds').value;
+  });
+
+  // Gợi ý quay lại phòng đang chơi dở (mất mạng, lỡ đóng tab...)
+  (async () => {
+    const pl = read('mln_player'), host = read('mln_host');
+    const items = [];
+    const pr = pl && pl.room ? await G.checkRoom(pl.room) : {};
+    if (pr.ok && !pr.ended) items.push(`<a class="btn small gold" href="play.html?room=${encodeURIComponent(pl.room)}">Tiếp tục chơi phòng <b class="num">${G.esc(pl.room)}</b> (${G.esc(pl.name || '')})</a>`);
+    if (host && host.room && (await G.checkRoom(host.room)).ok) items.push(`<a class="btn small" href="host.html">Quay lại màn hình host phòng <b class="num">${G.esc(host.room)}</b></a>`);
+    if (!items.length) return;
+    $('resume').innerHTML = `<span class="sub">Bạn đang có phòng chưa xong:</span>${items.join('')}`;
+    $('resume').classList.remove('hide');
+  })();
+})();
+</script>
+</body>
+</html>

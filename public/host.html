@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Màn hình host: Cờ Tỷ Phú</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E%F0%9F%8E%B2%3C/text%3E%3C/svg%3E">
+</head>
+<body class="host">
+<header class="hbar">
+  <h1>Cờ Tỷ Phú: Cạnh tranh và độc quyền</h1>
+  <button class="pill hide" id="roomPill" data-act="invite" title="Hiện mã QR mời người chơi"></button>
+  <span class="pill hide" id="phasePill"></span>
+  <span class="pill hide" id="roundPill"></span>
+  <span class="sp"></span>
+  <span id="ctrl" class="ctrl"></span>
+</header>
+<div class="hmain">
+  <div class="boardwrap"><div class="board" id="board"></div></div>
+  <aside class="side">
+    <div id="teams" style="display:grid;gap:10px"></div>
+    <div class="log" id="log" aria-live="polite"></div>
+  </aside>
+</div>
+<div id="conn" class="conn hide">Mất kết nối, đang nối lại…</div>
+<script src="config.js"></script>
+<script src="common.js"></script>
+<script src="vendor/qrcode.js"></script>
+<script src="board.js"></script>
+<script src="host.js"></script>
+</body>
+</html>
