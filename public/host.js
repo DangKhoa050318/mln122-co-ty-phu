@@ -15,7 +15,7 @@
   function hello() {
     if (saved && saved.room && !params.get('new')) return { t: 'host_resume', room: saved.room, hostToken: saved.token };
     if (saved && saved.room && params.get('new') && saved.created) return { t: 'host_resume', room: saved.room, hostToken: saved.token };
-    return { t: 'host_create', teams: Number(params.get('teams')) || 3, rounds: Number(params.get('rounds')) || 10 };
+    return { t: 'host_create', teams: Number(params.get('teams')) || 3, rounds: Number(params.get('rounds')) || 10, hold: params.get('hold') || 'phase' };
   }
   api = G.connect({
     hello,
@@ -55,6 +55,11 @@
   const team = (i) => S.teams[i];
   const teamTag = (i) => `<span class="dot" style="background:${team(i).color}"></span> <b>${esc(team(i).name)}</b>`;
 
+  // Nút chuyển bước cho màn đang chờ quản trò
+  const nextBtn = () => `<div class="nextrow"><button class="btn gold bigbtn" data-act="next">Tiếp tục ▶</button><span class="sub">Cả lớp đọc xong thì bấm (hoặc nhấn Space / Enter)</span></div>`;
+  const HOLD_LABEL = { phase: 'Chờ host: giới thiệu giai đoạn', all: 'Chờ host: mọi màn đọc', none: 'Tự chuyển theo giờ' };
+  const holdSelect = () => `<label class="holdsel" title="Màn đọc thông tin tự chuyển theo giờ hay chờ host bấm Tiếp tục"><span>Chuyển bước</span><select data-hold>${Object.entries(HOLD_LABEL).map(([k, v]) => `<option value="${k}" ${S.hold === k ? 'selected' : ''}>${v}</option>`).join('')}</select></label>`;
+
   function centerHTML() {
     const st = S.stage, d = st.data;
     switch (st.name) {
@@ -80,7 +85,7 @@
         return `<span class="pill" style="align-self:flex-start">Giai đoạn ${d.phase} / 3</span>
           <h2>${esc(p.name)}</h2><p class="lead">${esc(p.lead)}</p><p>${esc(p.body)}</p>
           <div><b style="font-size:.9em">Mở khóa trong giai đoạn này</b><ul class="unlock">${p.unlock.map((u) => `<li>${esc(u)}</li>`).join('')}</ul></div>
-          <p class="sub" style="margin-top:auto">${esc(p.ref)}</p>${timerBar(DUR.phase)}`;
+          <p class="sub" style="margin-top:auto">${esc(p.ref)}</p>${d.hold ? nextBtn() : timerBar(DUR.phase)}`;
       }
       case 'roll':
         return `<p class="sub">Vòng ${S.round}/${S.rounds}</p><h2>${teamTag(d.teamId)}</h2>
@@ -102,7 +107,7 @@
           <div class="opts">${d.opts.map((o, i) => `<div class="opt ${i === d.correct ? 'right' : 'wrong'}"><b>${LETTER[i]}</b><span>${esc(o)}</span></div>`).join('')}</div>
           <p class="sub"><b>Giải thích:</b> ${esc(d.why)}</p>
           <div class="bars">${bars}</div>
-          <p class="lead">${d.bonus ? `${teamTag(d.teamId)} đạt <b>lợi thế tri thức</b>: chi phí lượt này giảm 30%.` : `${teamTag(d.teamId)} chưa đạt lợi thế tri thức.`}</p>`;
+          <p class="lead">${d.bonus ? `${teamTag(d.teamId)} đạt <b>lợi thế tri thức</b>: chi phí lượt này giảm 30%.` : `${teamTag(d.teamId)} chưa đạt lợi thế tri thức.`}</p>${d.hold ? nextBtn() : ''}`;
       }
       case 'decision': {
         const tl = ST.tiles[d.tile];
@@ -115,7 +120,7 @@
       case 'result': {
         const lines = d.lines.map((l) => `<div class="logline ${l.kind}">${esc(l.text)}</div>`).join('');
         const card = d.card ? `<div class="cardbox ${d.card.crisis ? 'crisis' : ''}"><b>${d.card.crisis ? 'Khủng hoảng' : 'Thời cuộc'}: ${esc(d.card.title)}</b><div>${esc(d.card.text)}</div><div class="th">Lý thuyết: ${esc(d.card.theory)}</div></div>` : '';
-        return `<h3>${teamTag(d.teamId)} tại “${esc(ST.tiles[d.tile].name)}”</h3>${card}<div>${lines}</div>`;
+        return `<h3>${teamTag(d.teamId)} tại “${esc(ST.tiles[d.tile].name)}”</h3>${card}<div>${lines}</div>${d.hold ? nextBtn() : ''}`;
       }
       case 'end': return endHTML(d);
       default: return '';
@@ -187,7 +192,7 @@
     if (S.stage.name === 'end') return `<button class="btn ghost small" data-act="guide">Sổ tay lý thuyết</button><button class="btn small" data-act="new">Ván mới</button>`;
     return `<button class="btn ghost small" data-act="invite">Mời thêm</button><button class="btn ghost small" data-act="guide">Sổ tay lý thuyết</button>
       <button class="btn ghost small" data-act="${S.paused ? 'resume' : 'pause'}">${S.paused ? 'Tiếp tục' : 'Tạm dừng'}</button>
-      <button class="btn ghost small" data-act="skip">Bỏ qua bước này</button>
+      <button class="btn ghost small" data-act="skip">Bỏ qua bước này</button>${holdSelect()}
       <button class="btn ghost small" data-act="end">Kết thúc</button>`;
   }
 
@@ -204,6 +209,7 @@
       case 'pause': return send({ t: 'host_pause' });
       case 'resume': return send({ t: 'host_resume_game' });
       case 'skip': return send({ t: 'host_skip' });
+      case 'next': return S && S.stage.data.hold && send({ t: 'host_skip' });
       case 'end': if (confirm('Kết thúc game và xem kết quả?')) send({ t: 'host_end' }); return;
       case 'new': try { localStorage.removeItem('mln_host'); } catch (_) {} location.href = 'index.html'; return;
       case 'guide': return showGuide();
@@ -253,6 +259,17 @@
     tickTimers(S.stage);
   }
   setInterval(() => { if (S) tickTimers(S.stage); }, 150);
+  document.addEventListener('change', (e) => {
+    if (e.target.matches('[data-hold]')) send({ t: 'host_hold', mode: e.target.value });
+  });
+  // Space / Enter / → để chuyển màn đang chờ quản trò
+  document.addEventListener('keydown', (e) => {
+    if (!S || !S.stage.data.hold || e.repeat || e.ctrlKey || e.metaKey || e.altKey || document.getElementById('gmodal')) return;
+    if (e.target instanceof Element && e.target.closest('input, select, textarea, button, a')) return;
+    if (![' ', 'Enter', 'ArrowRight'].includes(e.key)) return;
+    e.preventDefault();
+    send({ t: 'host_skip' });
+  });
   // QR phụ thuộc IP mạng LAN: vẽ lại khi dò xong hoặc khi host đổi mạng
   G.netReady.then(render);
   window.onLanChange = render;

@@ -53,7 +53,7 @@ Không bắt buộc: chỉ Render là đủ. Nếu muốn giao diện nằm trê
 1. Host tạo phòng: chọn 3 đội, 8/10/12 vòng (khoảng 25–45 phút tùy tốc độ).
 2. Chiếu màn hình host; cả lớp quét QR (hoặc nhập mã trên máy tính), nhập tên. Người mới vào được xếp tạm vào đội ít người nhất, sau đó **tự chọn đội** trên máy của mình cho tới khi game bắt đầu. Host vẫn có thể xáo trộn đội, bấm tên để chuyển đội, bấm × để mời ra khỏi phòng. Biểu tượng 📱/💻 cho biết ai đang dùng thiết bị gì.
 3. **Chỉ host bắt đầu được game**: bấm nút "▶ Bắt đầu game" lớn ở giữa bàn cờ (hoặc nút "Bắt đầu game" góc trên phải). Nút bị khóa và ghi rõ lý do khi chưa có ai hoặc chưa có ít nhất 2 đội có người; đội không có ai sẽ bị loại khi bắt đầu. Mỗi lượt: một người tung xúc xắc → **cả lớp trả lời câu hỏi** → đội đang chơi đạt ≥50% đúng được giảm 30% chi phí → đội quyết định mua/thôn tính/đầu tư.
-4. Host có nút tạm dừng, bỏ qua, kết thúc. Nút "Sổ tay lý thuyết" mở bảng đối chiếu cơ chế với lý thuyết để giảng giải.
+4. Màn **giới thiệu giai đoạn** đứng yên cho tới khi host bấm **"Tiếp tục ▶"** (hoặc nhấn Space / Enter), để cả lớp đọc kịp. Ô "Chuyển bước" (khi tạo phòng hoặc trên thanh điều khiển, đổi được giữa ván) cho phép giữ thêm màn giải thích đáp án và kết quả lượt, hoặc để tự chuyển theo giờ như cũ. Host có nút tạm dừng, bỏ qua, kết thúc. Nút "Sổ tay lý thuyết" mở bảng đối chiếu cơ chế với lý thuyết để giảng giải.
 5. Điểm cuối = tài sản ròng + 10 × số câu trả lời đúng của đội.
 
 ## 4. Cơ chế ↔ lý thuyết

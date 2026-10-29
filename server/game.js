@@ -11,11 +11,18 @@ const SPEED = Number(process.env.GAME_SPEED || 1); // chỉ dùng khi chạy th�
 const DUR_BASE = { phase: 9000, roll: 20000, moving: 1800, quiz: 20000, quiz_result: 6500, decision: 20000, cartel_vote: 15000, result: 4800 };
 const DUR = Object.fromEntries(Object.entries(DUR_BASE).map(([k, v]) => [k, Math.max(30, Math.round(v / SPEED))]));
 const PROP_GROUPS = ['A', 'B', 'C', 'D', 'E', 'F'];
+// Màn "đọc" có thể đứng yên chờ quản trò bấm Tiếp tục thay vì tự chuyển theo giờ.
+// hold: 'none' = tự chuyển hết; 'phase' = chờ ở giới thiệu giai đoạn; 'all' = chờ cả giải thích đáp án và kết quả lượt.
+const HOLD_MODES = { none: [], phase: ['phase'], all: ['phase', 'quiz_result', 'result'] };
 
 class Game {
   constructor(opts, notify) {
     this.notify = notify;
-    this.cfg = { teams: Math.min(4, Math.max(2, opts.teams | 0 || 3)), rounds: Math.min(15, Math.max(4, opts.rounds | 0 || 10)) };
+    this.cfg = {
+      teams: Math.min(4, Math.max(2, opts.teams | 0 || 3)),
+      rounds: Math.min(15, Math.max(4, opts.rounds | 0 || 10)),
+      hold: HOLD_MODES[opts.hold] ? opts.hold : 'phase',
+    };
     this.players = new Map();
     this.nextPid = 1;
     this.teams = [];
@@ -76,8 +83,10 @@ class Game {
   }
 
   // ---------- điều khiển stage ----------
+  held(name) { return HOLD_MODES[this.cfg.hold].includes(name); }
   setStage(name, ms, data = {}) {
     clearTimeout(this.timer);
+    if (ms && this.held(name)) { ms = 0; data.hold = true; } // chờ quản trò bấm Tiếp tục
     this.stage = { name, deadline: ms ? Date.now() + ms : null, data };
     this.paused = false;
     if (ms) this.timer = setTimeout(() => this.onTimeout(), ms);
@@ -103,6 +112,23 @@ class Game {
     this.paused = false;
     this.stage.deadline = Date.now() + this.remaining;
     this.timer = setTimeout(() => this.onTimeout(), this.remaining);
+    this.notify();
+  }
+  // Đổi chế độ chuyển bước giữa chừng: áp dụng ngay cho màn đang hiện
+  setHold(mode) {
+    if (!HOLD_MODES[mode] || mode === this.cfg.hold) return;
+    this.cfg.hold = mode;
+    const st = this.stage;
+    if (this.started && st.name !== 'end' && DUR[st.name]) {
+      if (this.held(st.name) && !st.data.hold) {
+        clearTimeout(this.timer); this.timer = null;
+        st.deadline = null; st.data.hold = true; this.paused = false;
+      } else if (!this.held(st.name) && st.data.hold) {
+        st.data.hold = false;
+        st.deadline = Date.now() + DUR[st.name];
+        this.timer = setTimeout(() => this.onTimeout(), DUR[st.name]);
+      }
+    }
     this.notify();
   }
   skip() {
@@ -652,6 +678,7 @@ class Game {
       lobbyPlayers: this.started ? undefined : [...this.players.values()].map((p) => ({ id: p.id, name: p.name, team: p.team, online: p.online, device: p.device })),
       log: this.log.slice(-40),
       paused: this.paused,
+      hold: this.cfg.hold,
     };
   }
 

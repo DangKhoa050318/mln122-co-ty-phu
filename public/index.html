@@ -48,6 +48,12 @@
             <div class="field"><label for="rounds">Số vòng</label>
               <select id="rounds"><option value="8">8 vòng (~20 phút)</option><option value="10" selected>10 vòng (~27 phút)</option><option value="12">12 vòng (~33 phút)</option></select></div>
           </div>
+          <div class="field"><label for="hold">Màn đọc thông tin</label>
+            <select id="hold">
+              <option value="phase" selected>Chờ host bấm ở giới thiệu giai đoạn</option>
+              <option value="all">Chờ host bấm ở mọi màn đọc (giai đoạn, giải thích, kết quả lượt)</option>
+              <option value="none">Tự chuyển theo giờ</option>
+            </select></div>
           <button class="btn bigbtn" type="submit">Tạo phòng mới</button>
         </form>
       </section>
@@ -89,7 +95,7 @@
   $('hostForm').addEventListener('submit', (e) => {
     e.preventDefault();
     try { localStorage.removeItem('mln_host'); } catch (_) {}
-    location.href = 'host.html?new=1&teams=' + $('teams').value + '&rounds=' + $('rounds').value;
+    location.href = 'host.html?new=1&teams=' + $('teams').value + '&rounds=' + $('rounds').value + '&hold=' + $('hold').value;
   });
 
   // Gợi ý quay lại phòng đang chơi dở (mất mạng, lỡ đóng tab...)

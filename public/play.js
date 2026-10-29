@@ -122,6 +122,7 @@
   const timerBar = (ms) => `<div class="timer" data-timer data-total="${ms}"><i></i></div>`;
   const teamTag = (i) => `<span class="dot" style="background:${S.teams[i].color}"></span> <b>${esc(S.teams[i].name)}</b>`;
   const grpColor = (g) => ST.groups[g].color;
+  const waitHost = '<p class="waithost">⏸ Quản trò sẽ chuyển tiếp khi cả lớp đọc xong</p>';
   const kb = (k) => `<kbd class="kb">${k}</kbd>`;
   const devIcon = (m) => (m.device === 'mobile' ? '📱' : '💻');
 
@@ -157,7 +158,7 @@
           <p class="sub">${G.isMobile ? 'Giữ màn hình sáng. Nếu mất kết nối, trang sẽ tự nối lại.' : 'Phím tắt khi chơi: Space để tung xúc xắc, A–D hoặc 1–4 để trả lời, số 1–3 để chọn quyết định.'}</p></div>`;
       }
       case 'phase':
-        return `<div class="panel"><span class="pill" style="justify-self:start">Giai đoạn ${d.phase}/3</span><h2>${esc(d.info.name)}</h2><p class="lead">${esc(d.info.lead)}</p><p>${esc(d.info.body)}</p>${timerBar(DUR.phase)}</div>`;
+        return `<div class="panel"><span class="pill" style="justify-self:start">Giai đoạn ${d.phase}/3</span><h2>${esc(d.info.name)}</h2><p class="lead">${esc(d.info.lead)}</p><p>${esc(d.info.body)}</p>${d.hold ? waitHost : timerBar(DUR.phase)}</div>`;
       case 'roll': {
         const isMe = d.playerId === me.id;
         if (isMe) return `<div class="panel act"><p class="lead">Đến lượt đội bạn. Bạn là người tung xúc xắc.</p><button class="btn gold bigbtn" data-key="space enter r" data-send='{"t":"roll"}'>Tung xúc xắc ${kb('Space')}</button>${timerBar(DUR.roll)}</div>`;
@@ -178,7 +179,7 @@
         const t = d.perTeam[me.team];
         return `<div class="panel"><div class="verdict ${ok ? 'ok' : 'no'}">${my == null ? 'Bạn chưa trả lời' : ok ? 'Chính xác' : 'Chưa đúng'}</div>
           <div class="choices">${ch}</div><p><b>Giải thích:</b> ${esc(d.why)}</p>
-          <p class="sub">Đội bạn đúng ${t.correct}/${t.members}. ${d.bonus ? `${esc(S.teams[d.teamId].name)} đạt lợi thế tri thức.` : `${esc(S.teams[d.teamId].name)} chưa đạt lợi thế tri thức.`}</p></div>`;
+          <p class="sub">Đội bạn đúng ${t.correct}/${t.members}. ${d.bonus ? `${esc(S.teams[d.teamId].name)} đạt lợi thế tri thức.` : `${esc(S.teams[d.teamId].name)} chưa đạt lợi thế tri thức.`}</p>${d.hold ? waitHost : ''}</div>`;
       }
       case 'decision': {
         if (!mine) return `<div class="panel"><p class="lead">${teamTag(d.teamId)} đang quyết định</p><h2 style="font-size:1.2rem">${esc(d.title)}</h2><p class="sub">${esc(d.text)}</p>${timerBar(DUR.decision)}</div>`;
@@ -193,7 +194,7 @@
       case 'result': {
         const lines = d.lines.map((l) => `<div class="logline ${l.kind}">${esc(l.text)}</div>`).join('');
         const card = d.card ? `<div class="cardbox ${d.card.crisis ? 'crisis' : ''}"><b>${d.card.crisis ? 'Khủng hoảng' : 'Thời cuộc'}: ${esc(d.card.title)}</b><div>${esc(d.card.text)}</div><div class="th">${esc(d.card.theory)}</div></div>` : '';
-        return `<div class="panel"><h2 style="font-size:1.2rem">${teamTag(d.teamId)} tại “${esc(ST.tiles[d.tile].name)}”</h2>${card}<div>${lines}</div></div>`;
+        return `<div class="panel"><h2 style="font-size:1.2rem">${teamTag(d.teamId)} tại “${esc(ST.tiles[d.tile].name)}”</h2>${card}<div>${lines}</div>${d.hold ? waitHost : ''}</div>`;
       }
       case 'end': {
         const rows = d.ranking.map((r, i) => `<div class="r ${i === 0 ? 'first' : ''}" style="border-left-color:${S.teams[r.id].color}"><span class="big">${i + 1}</span><div><b>${esc(S.teams[r.id].name)}</b><div class="sub">Tài sản ${fmt(r.net)} · ${r.correct} câu đúng</div></div><span class="big">${fmt(r.score)}</span></div>`).join('');
@@ -226,7 +227,7 @@
           <p class="sub">📱 Quét QR · 💻 vào <b class="num">${esc(G.prettyUrl(G.siteBase()))}</b> nhập mã</p><p class="lead">${n} người trong phòng</p></div></div>`;
       }
       case 'phase':
-        return `<span class="pill" style="align-self:flex-start">Giai đoạn ${d.phase}/3</span><h2>${esc(d.info.name)}</h2><p class="lead">${esc(d.info.lead)}</p><div style="margin-top:auto">${timerBar(DUR.phase)}</div>`;
+        return `<span class="pill" style="align-self:flex-start">Giai đoạn ${d.phase}/3</span><h2>${esc(d.info.name)}</h2><p class="lead">${esc(d.info.lead)}</p><div style="margin-top:auto">${d.hold ? waitHost : timerBar(DUR.phase)}</div>`;
       case 'roll':
         return `<p class="sub">Vòng ${S.round}/${S.rounds}</p><h2>${teamTag(d.teamId)}</h2><p class="lead">${esc(d.playerName)} tung xúc xắc…</p><div style="margin-top:auto">${timerBar(DUR.roll)}</div>`;
       case 'moving':

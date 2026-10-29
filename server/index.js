@@ -116,7 +116,7 @@ wss.on('connection', (ws) => {
 function handle(ws, m) {
   const meta = ws.meta;
   if (m.t === 'host_create') {
-    const room = makeRoom({ teams: m.teams, rounds: m.rounds });
+    const room = makeRoom({ teams: m.teams, rounds: m.rounds, hold: m.hold });
     ws.meta = { room: room.code, role: 'host' };
     room.conns.add(ws);
     send(ws, { t: 'welcome', role: 'host', room: room.code, hostToken: room.hostToken, static: STATIC });
@@ -159,6 +159,7 @@ function handle(ws, m) {
         }
         return g.kick(m.playerId);
       case 'host_skip': return g.skip();
+      case 'host_hold': return g.setHold(String(m.mode || ''));
       case 'host_pause': return g.pause();
       case 'host_resume_game': return g.resume();
       case 'host_end': return g.forceEnd();

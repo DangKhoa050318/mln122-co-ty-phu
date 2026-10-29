@@ -21,7 +21,7 @@ const stats = { stages: {}, decisions: {}, errors: [], lines: 0 };
     if (m.t === 'state') { c.state = m.s; if (m.s.stage.name === 'end') { ended = true; endState = m.s; } }
     if (m.t === 'error') stats.errors.push(m.msg);
   });
-  hostC.send({ t: 'host_create', teams: TEAMS, rounds: ROUNDS });
+  hostC.send({ t: 'host_create', teams: TEAMS, rounds: ROUNDS, hold: 'none' });
   await sleep(300);
   const players = [];
   for (let i = 0; i < N; i++) {
